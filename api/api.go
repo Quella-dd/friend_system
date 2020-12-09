@@ -15,22 +15,24 @@ type Router struct {
 
 var routers = []Router{
 	{Method: http.MethodPost, Path: "/api/account/login", Handler: Login},
-	{Method: http.MethodPost, Path: "/api/account/logout", Handler: Logout},
+	{Method: http.MethodPost, Path: "/api/account/registry", Handler: Registry},
 
-	{Method: http.MethodGet, Path: "/api/friends/", Handler: ListFriend},
+	{Method: http.MethodGet, Path: "/api/friends", Handler: ListFriend},
 	{Method: http.MethodPost, Path: "/api/friend/:id", Handler: AddFriend},
 	{Method: http.MethodDelete, Path: "/api/friend/:id", Handler: DeleteFriend},
-	{Method: http.MethodGet, Path: "/api/friend/:name", Handler: SearchUsers},
+	{Method: http.MethodGet, Path: "/api/friends/:name", Handler: SearchUsers},
 
 	{Method: http.MethodGet, Path: "/api/articles", Handler: ListArticles},
 	{Method: http.MethodPost, Path: "/api/article", Handler: CreateArticle},
 	{Method: http.MethodGet, Path: "/api/article/:id", Handler: GetArticle},
 	{Method: http.MethodDelete, Path: "/api/article/:id", Handler: DeleteArticle},
 
-	{Method: http.MethodDelete, Path: " /api/comment/:id", Handler: DeleteComment},
+	{Method: http.MethodPost, Path: "/api/comment/:id", Handler: CreateComment},
+	{Method: http.MethodDelete, Path: "/api/comment/:id", Handler: DeleteComment},
 
-	{Method: http.MethodGet, Path: " /api/requests/", Handler: ListRequests},
-	{Method: http.MethodDelete, Path: " /api/request/:id", Handler: DeleteComment},
+	{Method: http.MethodGet, Path: "/api/requests/", Handler: ListRequests},
+	{Method: http.MethodPost, Path: "/api/requests/:id", Handler: AckRequest},
+	{Method: http.MethodDelete, Path: "/api/request/:id", Handler: DeleteRequest},
 }
 
 func InitRouters() {

@@ -63,8 +63,16 @@ func initMysql() {
 	}
 }
 
+func initDataTable() {
+	ManagerEnv.DB.AutoMigrate(&User{})
+	ManagerEnv.DB.AutoMigrate(&Article{})
+	ManagerEnv.DB.AutoMigrate(&Comment{})
+	ManagerEnv.DB.AutoMigrate(&Request{})
+}
+
 func init() {
 	InitManage()
 	LoadInit()
 	initMysql()
+	initDataTable()
 }

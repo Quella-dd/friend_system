@@ -9,7 +9,9 @@ import (
 func ListRequests(c *gin.Context) {
 	userID := c.GetHeader("userID")
 	if requests, err := models.ManagerEnv.ListUserRequest(userID); err != nil {
-		panic(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"request": requests,
@@ -17,10 +19,23 @@ func ListRequests(c *gin.Context) {
 	}
 }
 
+func AckRequest(c *gin.Context) {
+	id := c.Param("id")
+	if err := models.ManagerEnv.AckRequest(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	} else {
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 func DeleteRequest(c *gin.Context) {
 	id := c.Param("id")
 	if err := models.ManagerEnv.DeleteRequest(id); err !=  nil {
-		panic(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
 	} else {
 		c.JSON(http.StatusOK, nil)
 	}
