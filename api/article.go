@@ -7,7 +7,7 @@ import (
 )
 
 func ListArticles(c *gin.Context) {
-	userID := c.GetHeader("userID")
+	userID := c.GetString("userID")
 	if articles, err := models.ManagerEnv.GetUserArticles(userID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -20,7 +20,7 @@ func ListArticles(c *gin.Context) {
 }
 
 func CreateArticle(c *gin.Context) {
-	userID := c.GetHeader("userID")
+	userID := c.GetString("userID")
 	var article models.Article
 	if err := c.ShouldBind(&article); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

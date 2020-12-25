@@ -7,7 +7,7 @@ import (
 )
 
 func ListRequests(c *gin.Context) {
-	userID := c.GetHeader("userID")
+	userID := c.GetString("userID")
 	if requests, err := models.ManagerEnv.ListUserRequest(userID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,

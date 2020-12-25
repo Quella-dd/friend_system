@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"gopkg.in/ini.v1"
+	"os"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -17,11 +18,14 @@ type Manger struct {
 	*ArticleManager
 	*CommentManager
 	*RequestManager
+	*PhotoManager
 }
 
 type ManagerIni struct {
-	 Mysql
-	 Port string
+	Mysql
+	Port string
+	FilePath string
+	SecretKey string
 }
 
 type Mysql struct {
@@ -37,6 +41,7 @@ func InitManage() {
 		ArticleManager: NewArticleManager(),
 		CommentManager: NewCommentManager(),
 		RequestManager: NewRequestManager(),
+		PhotoManager: NewPhotoManager(),
 	}
 }
 
@@ -46,6 +51,8 @@ func LoadInit() {
 		panic(err)
 	}
 	ManagerConfig.Port = cfg.Section("").Key("Port").String()
+	ManagerConfig.FilePath = cfg.Section("").Key("FilePath").String()
+	ManagerConfig.SecretKey = cfg.Section("").Key("SecretKey").String()
 
 	ManagerConfig.Mysql.UserName = cfg.Section("mysql").Key("username").String()
 	ManagerConfig.Mysql.Password = cfg.Section("mysql").Key("password").String()
@@ -68,6 +75,15 @@ func initDataTable() {
 	ManagerEnv.DB.AutoMigrate(&Article{})
 	ManagerEnv.DB.AutoMigrate(&Comment{})
 	ManagerEnv.DB.AutoMigrate(&Request{})
+	ManagerEnv.DB.AutoMigrate(&PhotoRepository{})
+	ManagerEnv.DB.AutoMigrate(&Photo{})
+}
+
+// InitFileServe to save avatar and photo
+func initFileServe() {
+	if err := os.Mkdir(ManagerConfig.FilePath, 0777); err != nil && !os.IsExist(err) {
+		panic(err)
+	}
 }
 
 func init() {
@@ -75,4 +91,5 @@ func init() {
 	LoadInit()
 	initMysql()
 	initDataTable()
+	initFileServe()
 }

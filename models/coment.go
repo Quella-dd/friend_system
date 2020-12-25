@@ -6,6 +6,7 @@ import (
 
 type CommentManager struct {}
 
+// A 评论 B, Content
 type Comment struct {
 	gorm.Model
 	ArticleID string

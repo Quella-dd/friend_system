@@ -7,7 +7,7 @@ import (
 )
 
 func CreateComment(c *gin.Context) {
-	userID := c.GetHeader("userID")
+	userID := c.GetString("userID")
 	id := c.Param("id")
 
 	var comment models.Comment

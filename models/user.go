@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type AccountManager struct {}
@@ -37,11 +38,12 @@ func (u *RelationStruct) Scan(input interface{}) error {
 	return json.Unmarshal(input.([]byte), u)
 }
 
-func (m *AccountManager) Login(user User) error {
+func (m *AccountManager) Login(user *User) (string, error) {
 	if err := ManagerEnv.DB.Find(user).Error; err != nil {
-		return errors.New("recode has been exist")
+		return "", errors.New("recode has been exist")
 	}
-	return nil
+
+	return GenerateToken(user.Name, user.ID, 24 * time.Hour)
 }
 
 func (m *AccountManager) Registry(user *User) error {
@@ -58,7 +60,7 @@ func (m *AccountManager) ListFriend(id string) ([]User, error) {
 		return nil, err
 	}
 	if err := ManagerEnv.DB.Find(&users, []string(user.Relations)).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ListFriend error:", err)
 	}
 	return users, nil
 }
@@ -99,7 +101,7 @@ func (m *AccountManager) SearchUsers(name string) ([]User, error) {
 func (m *AccountManager) GetUser(id string) (*User, error) {
 	var user User
 	if err := ManagerEnv.DB.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s, %+v\n", id, err.Error())
 	}
 	return &user, nil
 }

@@ -14,11 +14,12 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	if err := models.ManagerEnv.Login(user); err != nil {
+	if token, err := models.ManagerEnv.Login(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "username or password error",
 		})
 	} else {
+		c.Writer.Header().Set("token", token)
 		c.JSON(http.StatusOK, gin.H{
 			"response": "login success",
 		})
@@ -41,8 +42,18 @@ func Registry(c *gin.Context)  {
 	}
 }
 
+// update name,
+func UpdateAccount(c *gin.Context) {
+
+}
+
+func DeleteAccount(c *gin.Context) {
+
+}
+
+// Friends 相关API
 func ListFriend(c *gin.Context) {
-	id := c.GetHeader("userID")
+	id := c.GetString("userID")
 	if users, err := models.ManagerEnv.ListFriend(id); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"error": err.Error(),
@@ -55,7 +66,7 @@ func ListFriend(c *gin.Context) {
 }
 
 func AddFriend(c *gin.Context) {
-	id := c.GetHeader("userID")
+	id := c.GetString("userID")
 	addID := c.Param("id")
 
 	var option models.AddUserOptions
@@ -70,7 +81,7 @@ func AddFriend(c *gin.Context) {
 }
 
 func DeleteFriend(c *gin.Context) {
-	id := c.GetHeader("userID")
+	id := c.GetString("userID")
 	friendID := c.Param("id")
 	if err := models.ManagerEnv.DeleteFriend(id, friendID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
