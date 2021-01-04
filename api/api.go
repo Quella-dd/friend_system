@@ -30,6 +30,11 @@ var routers = []Router{
 	{Method: http.MethodDelete, Path: "/api/friend/:id", Handler: DeleteFriend},
 	{Method: http.MethodGet, Path: "/api/friends/:name", Handler: SearchUsers},
 
+	// 添加用户请求
+	{Method: http.MethodGet, Path: "/api/requests/", Handler: ListRequests},
+	{Method: http.MethodPost, Path: "/api/request/:id", Handler: AckRequest},
+	{Method: http.MethodDelete, Path: "/api/request/:id", Handler: DeleteRequest},
+
 	// 说说详细信息，包括用户评论
 	{Method: http.MethodGet, Path: "/api/articles", Handler: ListArticles},
 	{Method: http.MethodPost, Path: "/api/article", Handler: CreateArticle},
@@ -39,11 +44,6 @@ var routers = []Router{
 	// 添加评论
 	{Method: http.MethodPost, Path: "/api/comment/:id", Handler: CreateComment},
 	{Method: http.MethodDelete, Path: "/api/comment/:id", Handler: DeleteComment},
-
-	// 添加用户请求
-	{Method: http.MethodGet, Path: "/api/requests/", Handler: ListRequests},
-	{Method: http.MethodPost, Path: "/api/request/:id", Handler: AckRequest},
-	{Method: http.MethodDelete, Path: "/api/request/:id", Handler: DeleteRequest},
 
 	// 相册，包括创建、删除、更新、详情
 	{Method: http.MethodGet, Path: "/api/repositories", Handler: ListRepository},
@@ -58,7 +58,7 @@ var routers = []Router{
 	{Method: http.MethodPost, Path: "/api/photo/repository/:id/:photoName", Handler: UploadPhoto},
 	{Method: http.MethodDelete, Path: "/api/photo/:photoName/repository/:id", Handler: DeletePhoto},
 
-	// TODO: 留言板， 包括创建、删除、评论、详情
+	// TODO: 留言板， 包括创建、删除、评论、详情, 业务逻辑类似Articles
 }
 
 func InitRouters() {

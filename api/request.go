@@ -21,13 +21,15 @@ func ListRequests(c *gin.Context) {
 
 func AckRequest(c *gin.Context) {
 	id := c.Param("id")
-	if err := models.ManagerEnv.AckRequest(id); err != nil {
+	userID := c.GetString("userID")
+
+	if err := models.ManagerEnv.AckRequest(id, userID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
-	} else {
-		c.JSON(http.StatusOK, nil)
+		return
 	}
+	c.JSON(http.StatusOK, nil)
 }
 
 func DeleteRequest(c *gin.Context) {

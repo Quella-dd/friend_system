@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"strconv"
 	"time"
 )
 
@@ -27,6 +28,11 @@ type User struct {
 	Relations RelationStruct `gorm:"type:json"`
 }
 
+type UpdateOptions struct {
+	Name string `form:"name"`
+	Email string `form:"email"`
+}
+
 type RelationStruct []string
 
 func (u RelationStruct) Value() (driver.Value, error) {
@@ -38,21 +44,39 @@ func (u *RelationStruct) Scan(input interface{}) error {
 	return json.Unmarshal(input.([]byte), u)
 }
 
+// ------------------- Login and Registry
 func (m *AccountManager) Login(user *User) (string, error) {
 	if err := ManagerEnv.DB.Find(user).Error; err != nil {
 		return "", errors.New("recode has been exist")
 	}
 
-	return GenerateToken(user.Name, user.ID, 24 * time.Hour)
+	return GenerateToken(user.Name, strconv.Itoa(int(user.ID)), 24 * time.Hour)
 }
 
+// 创建用户禁止用户名称重复
 func (m *AccountManager) Registry(user *User) error {
-	if err := ManagerEnv.DB.Save(user).Error; err != nil {
-		return err
+	if err := ManagerEnv.DB.Where("name = ?", user.Name).Error; err != nil {
+		return ManagerEnv.DB.Save(user).Error
 	}
-	return nil
+	return errors.New("name already taken")
 }
 
+
+// ------------------------ update and delete
+func (m *AccountManager) UpdateAccount(id string, options *UpdateOptions) error {
+	if user, err := m.GetUser(id); err  != nil {
+		return err
+	} else {
+		return ManagerEnv.DB.Model(&user).Update(options).Error
+	}
+}
+
+func (m *AccountManager) DeleteAccount(id string) error {
+	return ManagerEnv.DB.Delete("id = ?", id).Delete(&User{}).Error
+}
+
+
+// ----------------------- Friends
 func (m *AccountManager) ListFriend(id string) ([]User, error) {
 	var users []User
 	user, err := m.GetUser(id)
@@ -112,5 +136,25 @@ func (m *AccountManager) AckRequet(id, friendID string) error {
 		return errors.New("user not found")
 	}
 	self.Relations = append(self.Relations, friendID)
-	return ManagerEnv.DB.Model(&self).Update("relations", self.Relations).Error
+
+	// 更新user relations and request's status, 因此要开启一个事务，保证数据一致性
+	tx := ManagerEnv.DB.Begin()
+
+	if err := tx.Model(&self).Update("relations", self.Relations).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	request, err := ManagerEnv.GetRequest(id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&request).Updates(Request{Status: true}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }

@@ -35,10 +35,10 @@ type Photo struct {
 	RepositoryID string
 }
 
-func (m *PhotoManager) ListRepository() ([]PhotoRepositoryInfo, error) {
+func (m *PhotoManager) ListRepository(userID string) ([]PhotoRepositoryInfo, error) {
 	var repositoriyInfoes []PhotoRepositoryInfo
 	var repositories []PhotoRepository
-	if err := ManagerEnv.DB.Find(&repositories).Error; err != nil {
+	if err := ManagerEnv.DB.Where("UserID = ?", userID).Find(&repositories).Error; err != nil {
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func (m *PhotoManager) ListRepository() ([]PhotoRepositoryInfo, error) {
 
 func (m *PhotoManager) GetRepository(id string) (*PhotoRepository, error) {
 	var repository PhotoRepository
-	if err := ManagerEnv.DB.Find(&repository).Limit(1).Error; err != nil {
+	if err := ManagerEnv.DB.Where("id = ?", id).Find(&repository).Limit(1).Error; err != nil {
 		return nil, err
 	}
 	return &repository, nil
@@ -69,11 +69,8 @@ func (m *PhotoManager) CreateRepository(repository *PhotoRepository, userID stri
 }
 
 // update Description, Name
-func (m *PhotoManager) UpdateRepository(repository *PhotoRepository) error {
-	if err := ManagerEnv.DB.Where("id = ?", repository.ID).Update(&repository).Error; err != nil {
-		return err
-	}
-	return nil
+func (m *PhotoManager) UpdateRepository(id string, repository *PhotoRepository) error {
+	return ManagerEnv.DB.Where("id = ?", id).Update(&repository).Error
 }
 
 func (m *PhotoManager) DeleteRepository(id string) error {

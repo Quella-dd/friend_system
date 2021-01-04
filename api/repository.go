@@ -7,7 +7,8 @@ import (
 )
 
 func ListRepository(c *gin.Context) {
-	repository, err := models.ManagerEnv.ListRepository()
+	userID := c.GetHeader("userID")
+	repository, err := models.ManagerEnv.ListRepository(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 	} else {
@@ -45,12 +46,13 @@ func CreateRepository(c *gin.Context) {
 }
 
 func UpdateRepository(c *gin.Context) {
+	id := c.Param("id")
 	var repository models.PhotoRepository
 	if err := c.ShouldBind(&repository); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
 		return
 	}
-	if err := models.ManagerEnv.UpdateRepository(&repository); err != nil {
+	if err := models.ManagerEnv.UpdateRepository(id, &repository); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	} else {

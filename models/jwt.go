@@ -7,11 +7,11 @@ import (
 
 type LoginClaims struct {
 	UserName string
-	UserID interface{}
+	UserID string
 	jwt.StandardClaims
 }
 
-func GenerateToken(userName string, userID interface{}, expireDuration time.Duration) (string, error) {
+func GenerateToken(userName string, userID string, expireDuration time.Duration) (string, error) {
 	expire := time.Now().Add(expireDuration)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, LoginClaims {

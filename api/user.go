@@ -44,18 +44,37 @@ func Registry(c *gin.Context)  {
 
 // update name,
 func UpdateAccount(c *gin.Context) {
+	id := c.Param("id")
+	var updateOptions models.UpdateOptions
+	if err := c.ShouldBind(&updateOptions); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+	}
 
+	if err := models.ManagerEnv.UpdateAccount(id, &updateOptions); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
 }
 
 func DeleteAccount(c *gin.Context) {
-
+	id := c.Param("id")
+	if err := models.ManagerEnv.DeleteAccount(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, nil)
+	}
 }
 
 // Friends 相关API
 func ListFriend(c *gin.Context) {
 	id := c.GetString("userID")
 	if users, err := models.ManagerEnv.ListFriend(id); err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 	}  else {

@@ -6,6 +6,10 @@ import (
 
 type CommentManager struct {}
 
+func NewCommentManager() *CommentManager {
+	return &CommentManager{}
+}
+
 // A 评论 B, Content
 type Comment struct {
 	gorm.Model
@@ -23,19 +27,10 @@ func (m *CommentManager) GetComments(id interface{}) ([]Comment, error) {
 }
 
 func (m *CommentManager) CreateComment(comment Comment) error {
-	if err := ManagerEnv.DB.Save(&comment).Error; err != nil {
-		return err
-	}
-	return nil
+	return ManagerEnv.DB.Save(&comment).Error
 }
 
 func (m *CommentManager) DeleteComment(id string) error {
-	if err := ManagerEnv.DB.Delete(&Comment{}, id).Error; err != nil {
-		return err
-	}
-	return nil
+	return ManagerEnv.DB.Delete(&Comment{}, id).Error
 }
 
-func NewCommentManager() *CommentManager {
-	return &CommentManager{}
-}
